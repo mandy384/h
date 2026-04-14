@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Library Pro Dashboard</title>
+  <title>Library Full System</title>
   <style>
     body { font-family: Arial; text-align: center; }
 
@@ -16,8 +16,8 @@
     #seats { display: flex; flex-wrap: wrap; justify-content: center; }
 
     .seat {
-      width: 100px;
-      height: 100px;
+      width: 110px;
+      height: 110px;
       margin: 5px;
       background: green;
       color: white;
@@ -26,7 +26,10 @@
       justify-content: center;
       border-radius: 8px;
       cursor: pointer;
+      font-size: 11px;
+      text-align: center;
     }
+
     .occupied { background: red; }
 
     #form, #details {
@@ -44,7 +47,7 @@
 
 <body>
 
-<h2>📚 Library Dashboard</h2>
+<h2>📚 Library Full Management</h2>
 
 <div class="dashboard">
   <p id="stats"></p>
@@ -52,19 +55,31 @@
 
 <div id="seats"></div>
 
+<!-- FORM -->
 <div id="form">
   <h3>Fill Details</h3>
   <input id="name" placeholder="Name"><br>
+  <input id="father" placeholder="Father Name"><br>
   <input id="mobile" placeholder="Mobile"><br>
+  <input id="adhar" placeholder="Aadhar"><br>
+  <input id="shift" placeholder="Shift"><br>
+  <input id="from" type="date"><br>
+  <input id="to" type="date"><br>
+  <select id="payment">
+    <option>Cash</option>
+    <option>Online</option>
+  </select><br>
   <input id="totalFee" placeholder="Total Fee"><br>
   <input id="paid" placeholder="Paid Amount"><br>
   <button onclick="saveData()">Save</button>
 </div>
 
+<!-- DETAILS -->
 <div id="details">
-  <p id="showData"></p>
+  <pre id="showData"></pre>
   <button onclick="editData()">Edit</button>
   <button onclick="deleteData()">Reset</button>
+  <button onclick="sendMsg()">Send Msg</button>
 </div>
 
 <script>
@@ -90,7 +105,6 @@ function renderSeats() {
       seat.classList.add("occupied");
 
       occupied++;
-
       totalPaid += Number(savedSeats[i].paid || 0);
       totalDue += Number(savedSeats[i].due || 0);
     } else {
@@ -126,7 +140,13 @@ function saveData() {
 
   savedSeats[currentSeat] = {
     name: name.value,
+    father: father.value,
     mobile: mobile.value,
+    adhar: adhar.value,
+    shift: shift.value,
+    from: from.value,
+    to: to.value,
+    payment: payment.value,
     totalFee,
     paid,
     due
@@ -142,11 +162,17 @@ function showDetails(i) {
   let d = savedSeats[i];
 
   showData.innerText =
-    "Name: " + d.name +
-    "\nMobile: " + d.mobile +
-    "\nTotal Fee: ₹" + d.totalFee +
-    "\nPaid: ₹" + d.paid +
-    "\nDue: ₹" + d.due;
+`Name: ${d.name}
+Father: ${d.father}
+Mobile: ${d.mobile}
+Aadhar: ${d.adhar}
+Shift: ${d.shift}
+From: ${d.from}
+To: ${d.to}
+Payment: ${d.payment}
+Total Fee: ₹${d.totalFee}
+Paid: ₹${d.paid}
+Due: ₹${d.due}`;
 
   details.style.display = "block";
   form.style.display = "none";
@@ -156,7 +182,13 @@ function editData() {
   let d = savedSeats[currentSeat];
 
   name.value = d.name;
+  father.value = d.father;
   mobile.value = d.mobile;
+  adhar.value = d.adhar;
+  shift.value = d.shift;
+  from.value = d.from;
+  to.value = d.to;
+  payment.value = d.payment;
   totalFeeInput.value = d.totalFee;
   paidInput.value = d.paid;
 
@@ -172,8 +204,21 @@ function deleteData() {
   renderSeats();
 }
 
+function sendMsg() {
+  let d = savedSeats[currentSeat];
+  let msg = `Name: ${d.name}, Due: ₹${d.due}`;
+
+  window.open("https://wa.me/91" + d.mobile + "?text=" + encodeURIComponent(msg));
+}
+
 let name = document.getElementById("name");
+let father = document.getElementById("father");
 let mobile = document.getElementById("mobile");
+let adhar = document.getElementById("adhar");
+let shift = document.getElementById("shift");
+let from = document.getElementById("from");
+let to = document.getElementById("to");
+let payment = document.getElementById("payment");
 let totalFeeInput = document.getElementById("totalFee");
 let paidInput = document.getElementById("paid");
 
