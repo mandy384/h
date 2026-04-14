@@ -4,8 +4,8 @@
   <title>Library Pro System</title>
   <style>
     body {
-      text-align: center;
       font-family: Arial;
+      text-align: center;
     }
     #seats {
       display: flex;
@@ -13,46 +13,70 @@
       justify-content: center;
     }
     .seat {
-      width: 120px;
-      height: 120px;
-      margin: 6px;
+      width: 100px;
+      height: 100px;
+      margin: 5px;
       background: green;
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 10px;
+      font-size: 12px;
       text-align: center;
-      padding: 5px;
       white-space: pre-line;
     }
     .occupied {
       background: red;
     }
+    form {
+      display: none;
+      background: #eee;
+      padding: 15px;
+      margin: 10px;
+      border-radius: 10px;
+    }
+    input, select {
+      margin: 5px;
+      padding: 5px;
+      width: 90%;
+    }
     button {
       margin: 10px;
-      padding: 10px 20px;
-      background: black;
-      color: white;
-      border: none;
-      border-radius: 8px;
+      padding: 10px;
     }
   </style>
 </head>
 
 <body>
 
-<h2>📚 Library Full Management</h2>
-
-<button onclick="resetSeats()">Reset All</button>
+<h2>📚 Library Management System</h2>
 
 <div id="seats"></div>
 
+<!-- FORM -->
+<form id="form">
+  <h3>Enter Details</h3>
+  <input id="name" placeholder="Name"><br>
+  <input id="father" placeholder="Father Name"><br>
+  <input id="mobile" placeholder="Mobile No"><br>
+  <input id="adhar" placeholder="Aadhar No"><br>
+  <input id="shift" placeholder="Shift Time"><br>
+  <input id="from" type="date"><br>
+  <input id="to" type="date"><br>
+  <select id="payment">
+    <option>Cash</option>
+    <option>Online</option>
+  </select><br>
+  <button type="button" onclick="saveData()">Save</button>
+</form>
+
 <script>
-let totalSeats = 20;
+let totalSeats = 64;
 let seatsDiv = document.getElementById("seats");
+let form = document.getElementById("form");
+let currentSeat = null;
 
 let savedSeats = JSON.parse(localStorage.getItem("seats")) || {};
 
@@ -62,65 +86,42 @@ for (let i = 1; i <= totalSeats; i++) {
 
   if (savedSeats[i]) {
     let d = savedSeats[i];
-    seat.innerText =
-      "Name: " + d.name +
-      "\nFather: " + d.father +
-      "\nMob: " + d.mobile +
-      "\nShift: " + d.shift +
-      "\nFrom: " + d.from +
-      "\nTo: " + d.to +
-      "\nPay: " + d.payment;
+    seat.innerText = d.name + "\n" + d.mobile;
     seat.classList.add("occupied");
   } else {
     seat.innerText = "Seat " + i;
   }
 
   seat.onclick = function() {
-
-    let name = prompt("Name:");
-    if (!name) return;
-
-    let father = prompt("Father Name:");
-    let mobile = prompt("Mobile No:");
-    let adhar = prompt("Aadhar No:");
-    let shift = prompt("Shift Time:");
-    let from = prompt("Start Date:");
-    let to = prompt("End Date:");
-    let payment = prompt("Payment (Cash/Online):");
-
-    let today = new Date().toISOString().split("T")[0];
-
-    // due alert
-    if (to < today) {
-      alert("⚠️ Payment/Date Expired!");
-    }
-
-    seat.innerText =
-      "Name: " + name +
-      "\nFather: " + father +
-      "\nMob: " + mobile +
-      "\nShift: " + shift +
-      "\nFrom: " + from +
-      "\nTo: " + to +
-      "\nPay: " + payment;
-
-    seat.classList.add("occupied");
-
-    savedSeats[i] = {
-      name, father, mobile, adhar, shift, from, to, payment
-    };
-
-    localStorage.setItem("seats", JSON.stringify(savedSeats));
+    form.style.display = "block";
+    currentSeat = i;
   };
 
   seatsDiv.appendChild(seat);
 }
 
-function resetSeats() {
-  if (confirm("Reset all seats?")) {
-    localStorage.removeItem("seats");
-    location.reload();
+function saveData() {
+  let name = document.getElementById("name").value;
+  let father = document.getElementById("father").value;
+  let mobile = document.getElementById("mobile").value;
+  let adhar = document.getElementById("adhar").value;
+  let shift = document.getElementById("shift").value;
+  let from = document.getElementById("from").value;
+  let to = document.getElementById("to").value;
+  let payment = document.getElementById("payment").value;
+
+  if (!name) {
+    alert("Name required!");
+    return;
   }
+
+  savedSeats[currentSeat] = {
+    name, father, mobile, adhar, shift, from, to, payment
+  };
+
+  localStorage.setItem("seats", JSON.stringify(savedSeats));
+
+  location.reload();
 }
 </script>
 
