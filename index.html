@@ -1,9 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Library Pro System</title>
+  <title>Library Pro Dashboard</title>
   <style>
     body { font-family: Arial; text-align: center; }
+
+    .dashboard {
+      background: #222;
+      color: white;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 10px;
+    }
+
     #seats { display: flex; flex-wrap: wrap; justify-content: center; }
 
     .seat {
@@ -17,15 +26,13 @@
       justify-content: center;
       border-radius: 8px;
       cursor: pointer;
-      text-align: center;
-      font-size: 12px;
     }
     .occupied { background: red; }
 
     #form, #details {
       display: none;
       background: #eee;
-      padding: 15px;
+      padding: 10px;
       margin: 10px;
       border-radius: 10px;
     }
@@ -37,48 +44,42 @@
 
 <body>
 
-<h2>📚 Library System</h2>
+<h2>📚 Library Dashboard</h2>
+
+<div class="dashboard">
+  <p id="stats"></p>
+</div>
 
 <div id="seats"></div>
 
-<!-- FORM -->
 <div id="form">
   <h3>Fill Details</h3>
   <input id="name" placeholder="Name"><br>
-  <input id="father" placeholder="Father Name"><br>
-  <input id="mobile" placeholder="Mobile No"><br>
-  <input id="adhar" placeholder="Aadhar No"><br>
-  <input id="shift" placeholder="Shift Time"><br>
-  <input id="from" type="date"><br>
-  <input id="to" type="date"><br>
-  <select id="payment">
-    <option>Cash</option>
-    <option>Online</option>
-  </select><br>
+  <input id="mobile" placeholder="Mobile"><br>
+  <input id="totalFee" placeholder="Total Fee"><br>
+  <input id="paid" placeholder="Paid Amount"><br>
   <button onclick="saveData()">Save</button>
 </div>
 
-<!-- DETAILS -->
 <div id="details">
-  <h3>Student Details</h3>
   <p id="showData"></p>
-
   <button onclick="editData()">Edit</button>
   <button onclick="deleteData()">Reset</button>
-  <button onclick="sendMsg()">Send Msg</button>
 </div>
 
 <script>
 let totalSeats = 64;
 let seatsDiv = document.getElementById("seats");
-let form = document.getElementById("form");
-let details = document.getElementById("details");
 
-let currentSeat = null;
 let savedSeats = JSON.parse(localStorage.getItem("seats")) || {};
+let currentSeat = null;
 
 function renderSeats() {
   seatsDiv.innerHTML = "";
+
+  let occupied = 0;
+  let totalPaid = 0;
+  let totalDue = 0;
 
   for (let i = 1; i <= totalSeats; i++) {
     let seat = document.createElement("div");
@@ -87,6 +88,11 @@ function renderSeats() {
     if (savedSeats[i]) {
       seat.innerText = savedSeats[i].name;
       seat.classList.add("occupied");
+
+      occupied++;
+
+      totalPaid += Number(savedSeats[i].paid || 0);
+      totalDue += Number(savedSeats[i].due || 0);
     } else {
       seat.innerText = "Seat " + i;
     }
@@ -104,21 +110,28 @@ function renderSeats() {
 
     seatsDiv.appendChild(seat);
   }
+
+  document.getElementById("stats").innerText =
+    "Total Seats: " + totalSeats +
+    " | Occupied: " + occupied +
+    " | Empty: " + (totalSeats - occupied) +
+    " | Total Paid: ₹" + totalPaid +
+    " | Total Due: ₹" + totalDue;
 }
 
 function saveData() {
-  let data = {
+  let totalFee = Number(totalFeeInput.value);
+  let paid = Number(paidInput.value);
+  let due = totalFee - paid;
+
+  savedSeats[currentSeat] = {
     name: name.value,
-    father: father.value,
     mobile: mobile.value,
-    adhar: adhar.value,
-    shift: shift.value,
-    from: from.value,
-    to: to.value,
-    payment: payment.value
+    totalFee,
+    paid,
+    due
   };
 
-  savedSeats[currentSeat] = data;
   localStorage.setItem("seats", JSON.stringify(savedSeats));
 
   form.style.display = "none";
@@ -128,15 +141,12 @@ function saveData() {
 function showDetails(i) {
   let d = savedSeats[i];
 
-  document.getElementById("showData").innerText =
+  showData.innerText =
     "Name: " + d.name +
-    "\nFather: " + d.father +
     "\nMobile: " + d.mobile +
-    "\nAadhar: " + d.adhar +
-    "\nShift: " + d.shift +
-    "\nFrom: " + d.from +
-    "\nTo: " + d.to +
-    "\nPayment: " + d.payment;
+    "\nTotal Fee: ₹" + d.totalFee +
+    "\nPaid: ₹" + d.paid +
+    "\nDue: ₹" + d.due;
 
   details.style.display = "block";
   form.style.display = "none";
@@ -146,13 +156,9 @@ function editData() {
   let d = savedSeats[currentSeat];
 
   name.value = d.name;
-  father.value = d.father;
   mobile.value = d.mobile;
-  adhar.value = d.adhar;
-  shift.value = d.shift;
-  from.value = d.from;
-  to.value = d.to;
-  payment.value = d.payment;
+  totalFeeInput.value = d.totalFee;
+  paidInput.value = d.paid;
 
   form.style.display = "block";
   details.style.display = "none";
@@ -166,12 +172,10 @@ function deleteData() {
   renderSeats();
 }
 
-function sendMsg() {
-  let d = savedSeats[currentSeat];
-  let msg = "Seat booked by " + d.name + ", Mobile: " + d.mobile;
-
-  window.open("https://wa.me/91" + d.mobile + "?text=" + encodeURIComponent(msg));
-}
+let name = document.getElementById("name");
+let mobile = document.getElementById("mobile");
+let totalFeeInput = document.getElementById("totalFee");
+let paidInput = document.getElementById("paid");
 
 renderSeats();
 </script>
