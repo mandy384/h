@@ -1,39 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Library Seat Management</title>
-  <style>
-    body {
-      font-family: Arial;
-      text-align: center;
-    }
-    .seat {
-      width: 50px;
-      height: 50px;
-      margin: 5px;
-      display: inline-block;
-      line-height: 50px;
-      color: white;
-      cursor: pointer;
-      border-radius: 8px;
-    }
-    .empty {
-      background-color: green;
-    }
-    .occupied {
-      background-color: red;
-    }
-  </style>
-</head>
-
-<body>
-
-<h1>Library Seat Status</h1>
-
-<div id="seats"></div>
-
 <script>
-  let layout = [25, 25, 14];
+  let layout = [10,10,10,10,10,14];
   let seatNumber = 1;
   let seatsDiv = document.getElementById("seats");
 
@@ -41,6 +7,7 @@
 
   layout.forEach(row => {
     let rowDiv = document.createElement("div");
+    rowDiv.classList.add("row");
 
     for (let i = 0; i < row; i++) {
       let seat = document.createElement("div");
@@ -48,23 +15,37 @@
 
       let currentSeat = seatNumber;
 
-      if (savedSeats[currentSeat] === "occupied") {
+      let data = savedSeats[currentSeat] || {};
+
+      if (data.status === "occupied") {
         seat.classList.add("occupied");
       } else {
         seat.classList.add("empty");
       }
 
-      seat.innerText = currentSeat;
+      seat.innerText = data.name ? data.name : currentSeat;
 
       seat.onclick = function() {
-        if (seat.classList.contains("occupied")) {
-          seat.classList.remove("occupied");
-          seat.classList.add("empty");
-          savedSeats[currentSeat] = "empty";
-        } else {
+        let name = prompt("Enter student name:");
+
+        if (name) {
           seat.classList.remove("empty");
           seat.classList.add("occupied");
-          savedSeats[currentSeat] = "occupied";
+          seat.innerText = name;
+
+          savedSeats[currentSeat] = {
+            status: "occupied",
+            name: name
+          };
+        } else {
+          seat.classList.remove("occupied");
+          seat.classList.add("empty");
+          seat.innerText = currentSeat;
+
+          savedSeats[currentSeat] = {
+            status: "empty",
+            name: ""
+          };
         }
 
         localStorage.setItem("seats", JSON.stringify(savedSeats));
@@ -77,6 +58,3 @@
     seatsDiv.appendChild(rowDiv);
   });
 </script>
-
-</body>
-</html>
