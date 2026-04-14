@@ -7,14 +7,13 @@
       text-align: center;
       font-family: Arial;
     }
-    #seats {
+    .row {
       display: flex;
-      flex-wrap: wrap;
       justify-content: center;
     }
     .seat {
-      width: 60px;
-      height: 60px;
+      width: 55px;
+      height: 55px;
       margin: 5px;
       background: green;
       color: white;
@@ -29,6 +28,15 @@
     .occupied {
       background: red;
     }
+    button {
+      margin: 15px;
+      padding: 10px 20px;
+      border: none;
+      background: black;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -36,45 +44,63 @@
 
 <h1>📚 Library Seat System</h1>
 
+<button onclick="resetSeats()">Reset All</button>
+
 <div id="seats"></div>
 
 <script>
-  let totalSeats = 64; // 👈 ab 64 seats
-  let seatsDiv = document.getElementById("seats");
+  let layout = [8,8,8,8,8,8,8,8]; // 👈 8 rows = 64 seats
+  let seatNumber = 1;
 
   let savedSeats = JSON.parse(localStorage.getItem("seats")) || {};
 
-  for (let i = 1; i <= totalSeats; i++) {
-    let seat = document.createElement("div");
-    seat.className = "seat";
+  let seatsDiv = document.getElementById("seats");
 
-    // agar saved data hai
-    if (savedSeats[i]) {
-      seat.innerText = savedSeats[i].name;
-      seat.classList.add("occupied");
-    } else {
-      seat.innerText = i;
-    }
+  layout.forEach(row => {
+    let rowDiv = document.createElement("div");
+    rowDiv.className = "row";
 
-    seat.onclick = function() {
-      let name = prompt("Enter name:");
+    for (let i = 0; i < row; i++) {
+      let seat = document.createElement("div");
+      seat.className = "seat";
 
-      if (name && name.trim() !== "") {
-        seat.innerText = name;
+      let currentSeat = seatNumber;
+
+      if (savedSeats[currentSeat]) {
+        seat.innerText = savedSeats[currentSeat].name;
         seat.classList.add("occupied");
-
-        savedSeats[i] = { name: name };
       } else {
-        seat.innerText = i;
-        seat.classList.remove("occupied");
-
-        delete savedSeats[i];
+        seat.innerText = currentSeat;
       }
 
-      localStorage.setItem("seats", JSON.stringify(savedSeats));
-    };
+      seat.onclick = function() {
+        let name = prompt("Enter name:");
 
-    seatsDiv.appendChild(seat);
+        if (name && name.trim() !== "") {
+          seat.innerText = name;
+          seat.classList.add("occupied");
+          savedSeats[currentSeat] = { name: name };
+        } else {
+          seat.innerText = currentSeat;
+          seat.classList.remove("occupied");
+          delete savedSeats[currentSeat];
+        }
+
+        localStorage.setItem("seats", JSON.stringify(savedSeats));
+      };
+
+      rowDiv.appendChild(seat);
+      seatNumber++;
+    }
+
+    seatsDiv.appendChild(rowDiv);
+  });
+
+  function resetSeats() {
+    if (confirm("Reset all seats?")) {
+      localStorage.removeItem("seats");
+      location.reload();
+    }
   }
 </script>
 
