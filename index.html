@@ -8,9 +8,6 @@
       text-align: center;
       background: #f5f5f5;
     }
-    h1 {
-      color: #333;
-    }
     .row {
       display: flex;
       justify-content: center;
@@ -26,7 +23,6 @@
       cursor: pointer;
       border-radius: 10px;
       font-size: 12px;
-      text-align: center;
     }
     .empty {
       background-color: green;
@@ -79,46 +75,4 @@
         seat.classList.add("empty");
       }
 
-      seat.innerText = data.name ? data.name : currentSeat;
-
-      seat.onclick = function() {
-        let name = prompt("Enter student name:");
-
-        if (name && name.trim() !== "") {
-          seat.className = "seat occupied";
-          seat.innerText = name;
-
-          savedSeats[currentSeat] = {
-            status: "occupied",
-            name: name
-          };
-        } else {
-          seat.className = "seat empty";
-          seat.innerText = currentSeat;
-
-          savedSeats[currentSeat] = {
-            status: "empty",
-            name: ""
-          };
-        }
-
-        localStorage.setItem("seats", JSON.stringify(savedSeats));
-      };
-
-      rowDiv.appendChild(seat);
-      seatNumber++;
-    }
-
-    seatsDiv.appendChild(rowDiv);
-  });
-
-  function resetSeats() {
-    if (confirm("Reset all seats?")) {
-      localStorage.removeItem("seats");
-      location.reload();
-    }
-  }
-</script>
-
-</body>
-</html>
+      seat.innerText = data.name ? data.name :
