@@ -33,21 +33,49 @@
 <div id="seats"></div>
 
 <script>
-  let totalSeats = 64;
+  let layout = [25, 25, 14];
+  let seatNumber = 1;
   let seatsDiv = document.getElementById("seats");
 
-  for (let i = 1; i <= totalSeats; i++) {
-    let seat = document.createElement("div");
-    seat.classList.add("seat", "empty");
-    seat.innerText = i;
+  let savedSeats = JSON.parse(localStorage.getItem("seats")) || {};
 
-    seat.onclick = function() {
-      seat.classList.toggle("occupied");
-      seat.classList.toggle("empty");
-    };
+  layout.forEach(row => {
+    let rowDiv = document.createElement("div");
 
-    seatsDiv.appendChild(seat);
-  }
+    for (let i = 0; i < row; i++) {
+      let seat = document.createElement("div");
+      seat.classList.add("seat");
+
+      let currentSeat = seatNumber;
+
+      if (savedSeats[currentSeat] === "occupied") {
+        seat.classList.add("occupied");
+      } else {
+        seat.classList.add("empty");
+      }
+
+      seat.innerText = currentSeat;
+
+      seat.onclick = function() {
+        if (seat.classList.contains("occupied")) {
+          seat.classList.remove("occupied");
+          seat.classList.add("empty");
+          savedSeats[currentSeat] = "empty";
+        } else {
+          seat.classList.remove("empty");
+          seat.classList.add("occupied");
+          savedSeats[currentSeat] = "occupied";
+        }
+
+        localStorage.setItem("seats", JSON.stringify(savedSeats));
+      };
+
+      rowDiv.appendChild(seat);
+      seatNumber++;
+    }
+
+    seatsDiv.appendChild(rowDiv);
+  });
 </script>
 
 </body>
