@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Library Full System</title>
+  <title>Library Ultimate System</title>
   <style>
     body { font-family: Arial; text-align: center; }
 
     .dashboard {
-      background: #222;
+      background: black;
       color: white;
       padding: 10px;
-      margin: 10px;
       border-radius: 10px;
+      margin: 10px;
     }
 
     #seats { display: flex; flex-wrap: wrap; justify-content: center; }
 
     .seat {
-      width: 110px;
-      height: 110px;
+      width: 100px;
+      height: 100px;
       margin: 5px;
       background: green;
       color: white;
@@ -26,11 +26,11 @@
       justify-content: center;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 11px;
-      text-align: center;
+      font-size: 12px;
     }
 
     .occupied { background: red; }
+    .due { background: orange !important; }
 
     #form, #details {
       display: none;
@@ -42,16 +42,26 @@
 
     input, select { margin: 5px; padding: 5px; width: 90%; }
     button { margin: 5px; padding: 8px; }
+
+    #dueList div {
+      background: #ffd;
+      margin: 5px;
+      padding: 5px;
+      border-radius: 5px;
+    }
   </style>
 </head>
 
 <body>
 
-<h2>📚 Library Full Management</h2>
+<h2>📚 Library Ultimate System</h2>
 
 <div class="dashboard">
   <p id="stats"></p>
 </div>
+
+<h3>⚠️ Due Students</h3>
+<div id="dueList"></div>
 
 <div id="seats"></div>
 
@@ -70,7 +80,7 @@
     <option>Online</option>
   </select><br>
   <input id="totalFee" placeholder="Total Fee"><br>
-  <input id="paid" placeholder="Paid Amount"><br>
+  <input id="paid" placeholder="Paid"><br>
   <button onclick="saveData()">Save</button>
 </div>
 
@@ -85,7 +95,6 @@
 <script>
 let totalSeats = 64;
 let seatsDiv = document.getElementById("seats");
-
 let savedSeats = JSON.parse(localStorage.getItem("seats")) || {};
 let currentSeat = null;
 
@@ -101,12 +110,15 @@ function renderSeats() {
     seat.className = "seat";
 
     if (savedSeats[i]) {
-      seat.innerText = savedSeats[i].name;
+      let d = savedSeats[i];
+      seat.innerText = d.name;
       seat.classList.add("occupied");
 
+      if (d.due > 0) seat.classList.add("due");
+
       occupied++;
-      totalPaid += Number(savedSeats[i].paid || 0);
-      totalDue += Number(savedSeats[i].due || 0);
+      totalPaid += Number(d.paid || 0);
+      totalDue += Number(d.due || 0);
     } else {
       seat.innerText = "Seat " + i;
     }
@@ -126,11 +138,13 @@ function renderSeats() {
   }
 
   document.getElementById("stats").innerText =
-    "Total Seats: " + totalSeats +
+    "Seats: " + totalSeats +
     " | Occupied: " + occupied +
     " | Empty: " + (totalSeats - occupied) +
-    " | Total Paid: ₹" + totalPaid +
-    " | Total Due: ₹" + totalDue;
+    " | Paid: ₹" + totalPaid +
+    " | Due: ₹" + totalDue;
+
+  updateDueList();
 }
 
 function saveData() {
@@ -153,7 +167,6 @@ function saveData() {
   };
 
   localStorage.setItem("seats", JSON.stringify(savedSeats));
-
   form.style.display = "none";
   renderSeats();
 }
@@ -199,16 +212,38 @@ function editData() {
 function deleteData() {
   delete savedSeats[currentSeat];
   localStorage.setItem("seats", JSON.stringify(savedSeats));
-
   details.style.display = "none";
   renderSeats();
 }
 
 function sendMsg() {
   let d = savedSeats[currentSeat];
-  let msg = `Name: ${d.name}, Due: ₹${d.due}`;
-
+  let msg = `Hello ${d.name}, your due is ₹${d.due}`;
   window.open("https://wa.me/91" + d.mobile + "?text=" + encodeURIComponent(msg));
+}
+
+function updateDueList() {
+  let dueDiv = document.getElementById("dueList");
+  dueDiv.innerHTML = "";
+
+  for (let i in savedSeats) {
+    let d = savedSeats[i];
+
+    if (d.due > 0) {
+      let item = document.createElement("div");
+      item.innerText = "Seat " + i + " | " + d.name + " | Due: ₹" + d.due;
+
+      let btn = document.createElement("button");
+      btn.innerText = "Reminder";
+      btn.onclick = function() {
+        let msg = "Hello " + d.name + ", your due is ₹" + d.due;
+        window.open("https://wa.me/91" + d.mobile + "?text=" + encodeURIComponent(msg));
+      };
+
+      item.appendChild(btn);
+      dueDiv.appendChild(item);
+    }
+  }
 }
 
 let name = document.getElementById("name");
