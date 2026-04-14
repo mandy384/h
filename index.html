@@ -3,15 +3,9 @@
 <head>
   <title>Library Pro System</title>
   <style>
-    body {
-      font-family: Arial;
-      text-align: center;
-    }
-    #seats {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
+    body { font-family: Arial; text-align: center; }
+    #seats { display: flex; flex-wrap: wrap; justify-content: center; }
+
     .seat {
       width: 100px;
       height: 100px;
@@ -23,41 +17,33 @@
       justify-content: center;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 12px;
       text-align: center;
-      white-space: pre-line;
+      font-size: 12px;
     }
-    .occupied {
-      background: red;
-    }
-    form {
+    .occupied { background: red; }
+
+    #form, #details {
       display: none;
       background: #eee;
       padding: 15px;
       margin: 10px;
       border-radius: 10px;
     }
-    input, select {
-      margin: 5px;
-      padding: 5px;
-      width: 90%;
-    }
-    button {
-      margin: 10px;
-      padding: 10px;
-    }
+
+    input, select { margin: 5px; padding: 5px; width: 90%; }
+    button { margin: 5px; padding: 8px; }
   </style>
 </head>
 
 <body>
 
-<h2>📚 Library Management System</h2>
+<h2>📚 Library System</h2>
 
 <div id="seats"></div>
 
 <!-- FORM -->
-<form id="form">
-  <h3>Enter Details</h3>
+<div id="form">
+  <h3>Fill Details</h3>
   <input id="name" placeholder="Name"><br>
   <input id="father" placeholder="Father Name"><br>
   <input id="mobile" placeholder="Mobile No"><br>
@@ -69,60 +55,125 @@
     <option>Cash</option>
     <option>Online</option>
   </select><br>
-  <button type="button" onclick="saveData()">Save</button>
-</form>
+  <button onclick="saveData()">Save</button>
+</div>
+
+<!-- DETAILS -->
+<div id="details">
+  <h3>Student Details</h3>
+  <p id="showData"></p>
+
+  <button onclick="editData()">Edit</button>
+  <button onclick="deleteData()">Reset</button>
+  <button onclick="sendMsg()">Send Msg</button>
+</div>
 
 <script>
 let totalSeats = 64;
 let seatsDiv = document.getElementById("seats");
 let form = document.getElementById("form");
-let currentSeat = null;
+let details = document.getElementById("details");
 
+let currentSeat = null;
 let savedSeats = JSON.parse(localStorage.getItem("seats")) || {};
 
-for (let i = 1; i <= totalSeats; i++) {
-  let seat = document.createElement("div");
-  seat.className = "seat";
+function renderSeats() {
+  seatsDiv.innerHTML = "";
 
-  if (savedSeats[i]) {
-    let d = savedSeats[i];
-    seat.innerText = d.name + "\n" + d.mobile;
-    seat.classList.add("occupied");
-  } else {
-    seat.innerText = "Seat " + i;
+  for (let i = 1; i <= totalSeats; i++) {
+    let seat = document.createElement("div");
+    seat.className = "seat";
+
+    if (savedSeats[i]) {
+      seat.innerText = savedSeats[i].name;
+      seat.classList.add("occupied");
+    } else {
+      seat.innerText = "Seat " + i;
+    }
+
+    seat.onclick = function() {
+      currentSeat = i;
+
+      if (savedSeats[i]) {
+        showDetails(i);
+      } else {
+        form.style.display = "block";
+        details.style.display = "none";
+      }
+    };
+
+    seatsDiv.appendChild(seat);
   }
-
-  seat.onclick = function() {
-    form.style.display = "block";
-    currentSeat = i;
-  };
-
-  seatsDiv.appendChild(seat);
 }
 
 function saveData() {
-  let name = document.getElementById("name").value;
-  let father = document.getElementById("father").value;
-  let mobile = document.getElementById("mobile").value;
-  let adhar = document.getElementById("adhar").value;
-  let shift = document.getElementById("shift").value;
-  let from = document.getElementById("from").value;
-  let to = document.getElementById("to").value;
-  let payment = document.getElementById("payment").value;
-
-  if (!name) {
-    alert("Name required!");
-    return;
-  }
-
-  savedSeats[currentSeat] = {
-    name, father, mobile, adhar, shift, from, to, payment
+  let data = {
+    name: name.value,
+    father: father.value,
+    mobile: mobile.value,
+    adhar: adhar.value,
+    shift: shift.value,
+    from: from.value,
+    to: to.value,
+    payment: payment.value
   };
 
+  savedSeats[currentSeat] = data;
   localStorage.setItem("seats", JSON.stringify(savedSeats));
 
-  location.reload();
+  form.style.display = "none";
+  renderSeats();
 }
+
+function showDetails(i) {
+  let d = savedSeats[i];
+
+  document.getElementById("showData").innerText =
+    "Name: " + d.name +
+    "\nFather: " + d.father +
+    "\nMobile: " + d.mobile +
+    "\nAadhar: " + d.adhar +
+    "\nShift: " + d.shift +
+    "\nFrom: " + d.from +
+    "\nTo: " + d.to +
+    "\nPayment: " + d.payment;
+
+  details.style.display = "block";
+  form.style.display = "none";
+}
+
+function editData() {
+  let d = savedSeats[currentSeat];
+
+  name.value = d.name;
+  father.value = d.father;
+  mobile.value = d.mobile;
+  adhar.value = d.adhar;
+  shift.value = d.shift;
+  from.value = d.from;
+  to.value = d.to;
+  payment.value = d.payment;
+
+  form.style.display = "block";
+  details.style.display = "none";
+}
+
+function deleteData() {
+  delete savedSeats[currentSeat];
+  localStorage.setItem("seats", JSON.stringify(savedSeats));
+
+  details.style.display = "none";
+  renderSeats();
+}
+
+function sendMsg() {
+  let d = savedSeats[currentSeat];
+  let msg = "Seat booked by " + d.name + ", Mobile: " + d.mobile;
+
+  window.open("https://wa.me/91" + d.mobile + "?text=" + encodeURIComponent(msg));
+}
+
+renderSeats();
 </script>
 
 </body>
