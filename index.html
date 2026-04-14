@@ -7,7 +7,8 @@
 
   layout.forEach(row => {
     let rowDiv = document.createElement("div");
-    rowDiv.classList.add("row");
+    rowDiv.style.display = "flex";
+    rowDiv.style.justifyContent = "center";
 
     for (let i = 0; i < row; i++) {
       let seat = document.createElement("div");
@@ -28,7 +29,7 @@
       seat.onclick = function() {
         let name = prompt("Enter student name:");
 
-        if (name) {
+        if (name && name.trim() !== "") {
           seat.classList.remove("empty");
           seat.classList.add("occupied");
           seat.innerText = name;
