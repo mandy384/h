@@ -30,9 +30,9 @@
       text-align: center;
     }
 
-    .occupied { background: red; }
-    .due { background: orange !important; }
-    .expired { background: skyblue !important; }
+    .complete { background: red; }
+    .due { background: orange; }
+    .expired { background: skyblue; }
 
     #form, #details {
       display: none;
@@ -116,12 +116,13 @@ function renderSeats() {
     if (savedSeats[i]) {
       let d = savedSeats[i];
       seat.innerText = d.name;
-      seat.classList.add("occupied");
 
       if (d.to && d.to < today) {
         seat.classList.add("expired");
       } else if (d.due > 0) {
         seat.classList.add("due");
+      } else {
+        seat.classList.add("complete");
       }
 
       occupied++;
@@ -243,7 +244,7 @@ function updateDueList() {
       let item = document.createElement("div");
 
       if (d.to && d.to < today) {
-        item.innerText = "Seat " + i + " | " + d.name + " | ❌ Date Expired";
+        item.innerText = "Seat " + i + " | " + d.name + " | ❌ Expired";
       } else {
         item.innerText = "Seat " + i + " | " + d.name + " | Due: ₹" + d.due;
       }
