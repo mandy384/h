@@ -1,57 +1,18 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Library Seat Management</title>
-  <style>
-    body {
-      font-family: Arial;
-      text-align: center;
-    }
-    .row {
-      display: flex;
-      justify-content: center;
-    }
-    .seat {
-      width: 50px;
-      height: 50px;
-      margin: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      cursor: pointer;
-      border-radius: 8px;
-    }
-    .empty {
-      background-color: green;
-    }
-    .occupied {
-      background-color: red;
-    }
-  </style>
-</head>
-
-<body>
-
-<h1>Library Seat Status</h1>
-
-<div id="seats"></div>
-
 <script>
   let layout = [10,10,10,10,10,14];
   let seatNumber = 1;
+  let seatsDiv = document.getElementById("seats");
 
   let savedSeats = JSON.parse(localStorage.getItem("seats")) || {};
 
-  let seatsDiv = document.getElementById("seats");
-
   layout.forEach(row => {
     let rowDiv = document.createElement("div");
-    rowDiv.className = "row";
+    rowDiv.style.display = "flex";
+    rowDiv.style.justifyContent = "center";
 
     for (let i = 0; i < row; i++) {
       let seat = document.createElement("div");
-      seat.className = "seat";
+      seat.classList.add("seat");
 
       let currentSeat = seatNumber;
       let data = savedSeats[currentSeat] || {};
@@ -68,7 +29,8 @@
         let name = prompt("Enter student name:");
 
         if (name && name.trim() !== "") {
-          seat.className = "seat occupied";
+          seat.classList.remove("empty");
+          seat.classList.add("occupied");
           seat.innerText = name;
 
           savedSeats[currentSeat] = {
@@ -76,7 +38,8 @@
             name: name
           };
         } else {
-          seat.className = "seat empty";
+          seat.classList.remove("occupied");
+          seat.classList.add("empty");
           seat.innerText = currentSeat;
 
           savedSeats[currentSeat] = {
@@ -95,6 +58,3 @@
     seatsDiv.appendChild(rowDiv);
   });
 </script>
-
-</body>
-</html>
