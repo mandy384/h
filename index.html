@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Library Seat Management</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+    }
+    .seat {
+      width: 50px;
+      height: 50px;
+      margin: 5px;
+      display: inline-block;
+      line-height: 50px;
+      color: white;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    .empty {
+      background-color: green;
+    }
+    .occupied {
+      background-color: red;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>Library Seat Status</h1>
+
+<div id="seats"></div>
+
+<script>
+  let totalSeats = 64;
+  let seatsDiv = document.getElementById("seats");
+
+  for (let i = 1; i <= totalSeats; i++) {
+    let seat = document.createElement("div");
+    seat.classList.add("seat", "empty");
+    seat.innerText = i;
+
+    seat.onclick = function() {
+      seat.classList.toggle("occupied");
+      seat.classList.toggle("empty");
+    };
+
+    seatsDiv.appendChild(seat);
+  }
+</script>
+
+</body>
+</html>
