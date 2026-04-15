@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Library System Fix</title>
+  <title>Library Ultimate Pro + Login</title>
 
+  <!-- PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
     body { font-family: Arial; text-align: center; }
+
+    #loginBox { margin-top: 100px; }
+    #app { display: none; }
+
+    input, select { margin: 5px; padding: 6px; }
+    button { margin: 5px; padding: 8px; }
 
     .seat {
       width: 100px;
@@ -25,6 +32,14 @@
     .due { background: orange; }
     .expired { background: skyblue; }
 
+    .dashboard {
+      background: black;
+      color: white;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 10px;
+    }
+
     #form, #details {
       display: none;
       background: #eee;
@@ -32,28 +47,43 @@
       margin: 10px;
       border-radius: 10px;
     }
-
-    input { margin: 4px; padding: 6px; }
-    button { margin: 4px; padding: 8px; }
   </style>
 </head>
 
 <body>
 
+<!-- LOGIN -->
+<div id="loginBox">
+  <h2>🔐 Login</h2>
+  <input id="user" placeholder="Username"><br>
+  <input id="pass" type="password" placeholder="Password"><br>
+  <button onclick="login()">Login</button>
+</div>
+
+<!-- APP -->
+<div id="app">
+
 <h2>📚 Library System</h2>
+<button onclick="logout()">Logout</button>
+<button onclick="downloadPDF()">📄 Full PDF</button>
+<button onclick="monthlyReport()">📊 Monthly</button>
+
+<div class="dashboard">
+  <p id="stats"></p>
+</div>
+
+<h3>⚠️ Due / Expired</h3>
+<div id="dueList"></div>
 
 <div id="seats"></div>
 
 <div id="form">
   <input id="name" placeholder="Name"><br>
-  <input id="father" placeholder="Father Name"><br>
-  <input id="aadhaar" placeholder="Aadhaar No"><br>
   <input id="mobile" placeholder="Mobile"><br>
   <input id="from" type="date"><br>
   <input id="to" type="date"><br>
   <input id="totalFee" placeholder="Total Fee"><br>
   <input id="paid" placeholder="Paid"><br>
-
   <button onclick="saveData()">Save</button>
 </div>
 
@@ -61,94 +91,181 @@
   <pre id="showData"></pre>
   <button onclick="editData()">Edit</button>
   <button onclick="deleteData()">Delete</button>
+  <button onclick="sendMsg()">WhatsApp</button>
+  <button onclick="receipt()">Receipt</button>
+</div>
+
 </div>
 
 <script>
+// LOGIN
+let admin="admin", password="1234";
 
-let savedSeats = JSON.parse(localStorage.getItem("seats")) || {};
-let currentSeat = null;
+function login(){
+  if(user.value===admin && pass.value===password){
+    localStorage.setItem("login","yes");
+    showApp();
+  } else alert("Wrong login");
+}
+
+function logout(){
+  localStorage.removeItem("login");
+  location.reload();
+}
+
+function showApp(){
+  loginBox.style.display="none";
+  app.style.display="block";
+}
+
+if(localStorage.getItem("login")==="yes") showApp();
+
+// DATA
+let seatsDiv=document.getElementById("seats");
+let savedSeats=JSON.parse(localStorage.getItem("seats"))||{};
+let currentSeat=null;
 
 function render(){
-  let seatsDiv = document.getElementById("seats");
-  seatsDiv.innerHTML = "";
+  seatsDiv.innerHTML="";
+  let today=new Date().toISOString().split("T")[0];
+  let occ=0,paid=0,due=0;
 
   for(let i=1;i<=64;i++){
-    let s = document.createElement("div");
-    s.className = "seat";
+    let s=document.createElement("div");
+    s.className="seat";
 
     if(savedSeats[i]){
-      s.innerText = savedSeats[i].name || "No Name";
-    } else {
-      s.innerText = "Seat " + i;
-    }
+      let d=savedSeats[i];
+      s.innerText=d.name;
 
-    s.onclick = () => {
-      currentSeat = i;
+      if(d.to && d.to<today) s.classList.add("expired");
+      else if(d.due>0) s.classList.add("due");
+      else s.classList.add("complete");
+
+      occ++;
+      paid+=Number(d.paid||0);
+      due+=Number(d.due||0);
+    } else s.innerText="Seat "+i;
+
+    s.onclick=()=>{
+      currentSeat=i;
       if(savedSeats[i]) show(i);
-      else document.getElementById("form").style.display = "block";
+      else form.style.display="block";
     };
 
     seatsDiv.appendChild(s);
   }
+
+  stats.innerText=`Seats:64 | Used:${occ} | Empty:${64-occ} | Paid:₹${paid} | Due:₹${due}`;
+  dueListUpdate();
 }
 
 function saveData(){
-  let tf = Number(document.getElementById("totalFee").value);
-  let p = Number(document.getElementById("paid").value);
+  let tf=Number(totalFee.value);
+  let p=Number(paid.value);
 
-  savedSeats[currentSeat] = {
-    name: document.getElementById("name").value,
-    father: document.getElementById("father").value,
-    aadhaar: document.getElementById("aadhaar").value,
-    mobile: document.getElementById("mobile").value,
-    from: document.getElementById("from").value,
-    to: document.getElementById("to").value,
-    totalFee: tf,
-    paid: p,
-    due: tf - p
+  savedSeats[currentSeat]={
+    name:name.value,
+    mobile:mobile.value,
+    from:from.value,
+    to:to.value,
+    totalFee:tf,
+    paid:p,
+    due:tf-p
   };
 
-  localStorage.setItem("seats", JSON.stringify(savedSeats));
-  document.getElementById("form").style.display = "none";
+  localStorage.setItem("seats",JSON.stringify(savedSeats));
+  form.style.display="none";
   render();
 }
 
 function show(i){
-  let d = savedSeats[i];
-
-  document.getElementById("showData").innerText =
-`Name: ${d.name || ""}
-Father: ${d.father || ""}
-Aadhaar: ${d.aadhaar || ""}
-Mobile: ${d.mobile || ""}
-Paid: ${d.paid || 0}
-Due: ${d.due || 0}`;
-
-  document.getElementById("details").style.display = "block";
+  let d=savedSeats[i];
+  showData.innerText=`Name:${d.name}\nMobile:${d.mobile}\nPaid:${d.paid}\nDue:${d.due}`;
+  details.style.display="block";
 }
 
 function editData(){
-  let d = savedSeats[currentSeat];
-
-  document.getElementById("name").value = d.name || "";
-  document.getElementById("father").value = d.father || "";
-  document.getElementById("aadhaar").value = d.aadhaar || "";
-  document.getElementById("mobile").value = d.mobile || "";
-  document.getElementById("totalFee").value = d.totalFee || "";
-  document.getElementById("paid").value = d.paid || "";
-
-  document.getElementById("form").style.display = "block";
+  let d=savedSeats[currentSeat];
+  name.value=d.name;
+  mobile.value=d.mobile;
+  totalFee.value=d.totalFee;
+  paid.value=d.paid;
+  form.style.display="block";
 }
 
 function deleteData(){
   delete savedSeats[currentSeat];
-  localStorage.setItem("seats", JSON.stringify(savedSeats));
-  document.getElementById("details").style.display = "none";
+  localStorage.setItem("seats",JSON.stringify(savedSeats));
+  details.style.display="none";
   render();
 }
 
-render();
+function sendMsg(){
+  let d=savedSeats[currentSeat];
+  window.open("https://wa.me/91"+d.mobile+"?text=Due:"+d.due);
+}
 
+function dueListUpdate(){
+  dueList.innerHTML="";
+  let today=new Date().toISOString().split("T")[0];
+
+  for(let i in savedSeats){
+    let d=savedSeats[i];
+    if((d.to && d.to<today)||d.due>0){
+      let div=document.createElement("div");
+      div.innerText=`Seat ${i} | ${d.name} | Due:${d.due}`;
+      dueList.appendChild(div);
+    }
+  }
+}
+
+// PDF
+function downloadPDF(){
+  const {jsPDF}=window.jspdf;
+  let doc=new jsPDF(),y=10;
+  for(let i in savedSeats){
+    let d=savedSeats[i];
+    doc.text(`Seat ${i} ${d.name} Paid:${d.paid} Due:${d.due}`,10,y);
+    y+=8;
+  }
+  doc.save("report.pdf");
+}
+
+// Monthly
+function monthlyReport(){
+  const {jsPDF}=window.jspdf;
+  let doc=new jsPDF(),y=10;
+  let m=new Date().getMonth();
+
+  for(let i in savedSeats){
+    let d=savedSeats[i];
+    if(d.from){
+      let dt=new Date(d.from);
+      if(dt.getMonth()==m){
+        doc.text(`${d.name} Paid:${d.paid}`,10,y);
+        y+=8;
+      }
+    }
+  }
+  doc.save("monthly.pdf");
+}
+
+// Receipt
+function receipt(){
+  const {jsPDF}=window.jspdf;
+  let doc=new jsPDF();
+  let d=savedSeats[currentSeat];
+
+  doc.text("Receipt",10,10);
+  doc.text("Name:"+d.name,10,20);
+  doc.text("Paid:"+d.paid,10,30);
+  doc.text("Due:"+d.due,10,40);
+
+  doc.save("receipt.pdf");
+}
+
+render();
 </script>
 
 </body>
