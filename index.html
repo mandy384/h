@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Wisdom-Nest-Library PRO</title>
+<title>Library Ultimate Pro</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -56,13 +56,14 @@ button { margin: 5px; padding: 8px; }
 
 <body>
 
-<h2>📚 Wisdom-Nest-Library</h2>
+<h2>📚 Library Ultimate Pro</h2>
 
 <div class="dashboard">
 <p id="stats"></p>
 </div>
 
 <button onclick="downloadPDF()">📄 Full Report</button>
+<button onclick="monthlyReport()">📊 Monthly Report</button>
 
 <h3>⚠️ Due / Expired</h3>
 <div id="dueList"></div>
@@ -95,15 +96,13 @@ button { margin: 5px; padding: 8px; }
 <pre id="showData"></pre>
 <button onclick="editData()">Edit</button>
 <button onclick="deleteData()">Reset</button>
-<button onclick="sendMsg()">📩 SMS</button>
+<button onclick="sendMsg()">📩 SMS Reminder</button>
 <button onclick="downloadReceipt()">🧾 Receipt</button>
 </div>
 
 <script>
-
-const API = "https://69e0a2c429c070e6597bc6bf.mockapi.io/wisdomnestlibrary";
-
-let savedSeats = {};
+let seatsDiv = document.getElementById("seats");
+let savedSeats = JSON.parse(localStorage.getItem("seats")) || {};
 let currentSeat = null;
 
 const layout = [
@@ -118,68 +117,11 @@ const layout = [
 [60,59,58,57,0,0,56,55]
 ];
 
-// LOAD
-async function loadData(){
-  let res = await fetch(API);
-  let arr = await res.json();
-
-  savedSeats = {};
-  arr.forEach(d=>{
-    savedSeats[d.seat] = d;
-  });
-
-  renderSeats();
-}
-
-// SAVE
-async function saveData(){
-
-  let obj={
-    seat: currentSeat,
-    name: document.getElementById("name").value,
-    father: father.value,
-    mobile: mobile.value,
-    adhar: adhar.value,
-    shift: shift.value,
-    from: from.value,
-    to: to.value,
-    payment: payment.value,
-    totalFee: Number(totalFee.value||0),
-    paid: Number(paid.value||0),
-    due: Number(totalFee.value||0) - Number(paid.value||0)
-  };
-
-  let res = await fetch(API);
-  let arr = await res.json();
-  let existing = arr.find(d => d.seat == currentSeat);
-
-  if(existing){
-    await fetch(API+"/"+existing.id,{
-      method:"PUT",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify(obj)
-    });
-  }else{
-    await fetch(API,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify(obj)
-    });
-  }
-
-  form.style.display="none";
-  loadData();
-}
-
-// RENDER
-function renderSeats(){
-  seats.innerHTML="";
+function renderSeats() {
+  seatsDiv.innerHTML = "";
 
   let occupied=0,totalPaid=0,totalDue=0;
-  let cash=0,online=0;
-  let totalSeats=60;
-
-  let today=new Date().toISOString().split("T")[0];
+  let today = new Date().toISOString().split("T")[0];
 
   layout.forEach(row=>{
     row.forEach(i=>{
@@ -192,10 +134,7 @@ function renderSeats(){
 
         if(savedSeats[i]){
           let d=savedSeats[i];
-          seat.innerHTML = `<b>${i}</b><br>${d.name}`;
-
-          if(d.payment=="Cash") cash++;
-          else online++;
+          seat.innerHTML = i+"<br>"+d.name;
 
           if(d.to && d.to<today) seat.classList.add("expired");
           else if(d.due>0) seat.classList.add("due");
@@ -204,7 +143,6 @@ function renderSeats(){
           occupied++;
           totalPaid+=Number(d.paid||0);
           totalDue+=Number(d.due||0);
-
         }else{
           seat.innerText="Seat "+i;
         }
@@ -216,24 +154,55 @@ function renderSeats(){
         };
       }
 
-      seats.appendChild(seat);
+      seatsDiv.appendChild(seat);
     });
   });
 
-  let empty = totalSeats - occupied;
-
   stats.innerText=
-  `Total Seats: ${totalSeats}
-Occupied: ${occupied}
-Empty: ${empty}
-Paid: ₹${totalPaid}
-Due: ₹${totalDue}
-Cash: ${cash}
-Online: ${online}`;
+  "Seats: 60 | Occupied: "+occupied+
+  " | Empty: "+(60-occupied)+
+  " | Paid: ₹"+totalPaid+
+  " | Due: ₹"+totalDue;
 
   updateDueList();
 }
 
+// SAVE
+function saveData(){
+  let totalFee=Number(totalFeeInput.value);
+  let paid=Number(paidInput.value);
+
+  savedSeats[currentSeat]={
+    name:name.value,
+    father:father.value,
+    mobile:mobile.value,
+    adhar:adhar.value,
+    shift:shift.value,
+    from:from.value,
+    to:to.value,
+    payment:payment.value,
+    totalFee,
+    paid,
+    due:totalFee-paid
+  };
+
+  localStorage.setItem("seats",JSON.stringify(savedSeats));
+  form.style.display="none";
+  renderSeats();
+}
+
+// ✅ SMS FUNCTION
+function sendMsg(){
+  let d = savedSeats[currentSeat];
+
+  let msg = `Hello ${d.name},
+Your library fee due is ₹${d.due}.
+Please pay soon.`;
+
+  window.location.href = `sms:${d.mobile}?body=${encodeURIComponent(msg)}`;
+}
+
+// बाकी SAME
 function showDetails(i){
 let d=savedSeats[i];
 showData.innerText=`Seat: ${i}
@@ -254,7 +223,7 @@ form.style.display="none";
 
 function editData(){
 let d=savedSeats[currentSeat];
-document.getElementById("name").value=d.name;
+name.value=d.name;
 father.value=d.father;
 mobile.value=d.mobile;
 adhar.value=d.adhar;
@@ -262,65 +231,35 @@ shift.value=d.shift;
 from.value=d.from;
 to.value=d.to;
 payment.value=d.payment;
-totalFee.value=d.totalFee;
-paid.value=d.paid;
+totalFeeInput.value=d.totalFee;
+paidInput.value=d.paid;
 form.style.display="block";
 details.style.display="none";
 }
 
 function deleteData(){
-fetch(API).then(r=>r.json()).then(arr=>{
-let item=arr.find(d=>d.seat==currentSeat);
-if(item){
-fetch(API+"/"+item.id,{method:"DELETE"}).then(loadData);
-}
-});
+delete savedSeats[currentSeat];
+localStorage.setItem("seats",JSON.stringify(savedSeats));
 details.style.display="none";
+renderSeats();
 }
 
-// 🔥 FINAL SMS FUNCTION
-function sendMsg(){
-  let d = savedSeats[currentSeat];
+function updateDueList(){
+dueList.innerHTML="";
+let today=new Date().toISOString().split("T")[0];
 
-  let msg = `📚 Wisdom Nest Library
+for(let i in savedSeats){
+let d=savedSeats[i];
 
-Hello ${d.name},
-
-Seat No: ${currentSeat}
-Shift: ${d.shift}
-Time: ${d.from} to ${d.to}
-
-Payment Mode: ${d.payment}
-Total Fee: ₹${d.totalFee}
-Paid: ₹${d.paid}
-Due: ₹${d.due}
-
-⚠️ Kindly clear your pending fee as soon as possible.
-
-----------------------------
-
-📚 विजडम नेस्ट लाइब्रेरी
-
-नमस्ते ${d.name},
-
-सीट नंबर: ${currentSeat}
-शिफ्ट: ${d.shift}
-समय: ${d.from} से ${d.to}
-
-भुगतान प्रकार: ${d.payment}
-कुल फीस: ₹${d.totalFee}
-जमा राशि: ₹${d.paid}
-बकाया: ₹${d.due}
-
-⚠️ कृपया अपनी बकाया फीस जल्द जमा करें।
-
-----------------------------
-
-🙏 Thank You | धन्यवाद`;
-
-  window.location.href = `sms:${d.mobile}?body=${encodeURIComponent(msg)}`;
+if((d.to && d.to<today)||d.due>0){
+let div=document.createElement("div");
+div.innerText="Seat "+i+" | "+d.name+" | Due ₹"+d.due;
+dueList.appendChild(div);
+}
+}
 }
 
+// PDF SAME
 function downloadPDF(){
 const { jsPDF } = window.jspdf;
 let doc=new jsPDF(),y=10;
@@ -333,20 +272,38 @@ y+=8;
 doc.save("report.pdf");
 }
 
-function updateDueList(){
-dueList.innerHTML="";
-for(let i in savedSeats){
-let d=savedSeats[i];
-if(d.due>0){
-let div=document.createElement("div");
-div.innerText="Seat "+i+" | "+d.name+" | ₹"+d.due;
-dueList.appendChild(div);
-}
-}
+function monthlyReport(){
+downloadPDF();
 }
 
-loadData();
+function downloadReceipt(){
+const { jsPDF } = window.jspdf;
+let doc=new jsPDF();
+let d=savedSeats[currentSeat];
 
+doc.text("Receipt",10,10);
+doc.text(d.name,10,20);
+doc.save("receipt.pdf");
+}
+
+// refs
+let name=document.getElementById("name");
+let father=document.getElementById("father");
+let mobile=document.getElementById("mobile");
+let adhar=document.getElementById("adhar");
+let shift=document.getElementById("shift");
+let from=document.getElementById("from");
+let to=document.getElementById("to");
+let payment=document.getElementById("payment");
+let totalFeeInput=document.getElementById("totalFee");
+let paidInput=document.getElementById("paid");
+let form=document.getElementById("form");
+let details=document.getElementById("details");
+let stats=document.getElementById("stats");
+let dueList=document.getElementById("dueList");
+let showData=document.getElementById("showData");
+
+renderSeats();
 </script>
 
 </body>
