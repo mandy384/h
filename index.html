@@ -6,31 +6,31 @@
 <style>
 body {
   font-family: Arial;
-  background: #f4f4f4;
+  background: #eee;
   text-align: center;
 }
 
 .room {
   position: relative;
   width: 520px;
-  height: 1050px; /* 👉 height bada kiya */
+  height: 1100px; /* 👉 full height */
   margin: auto;
   border: 3px solid black;
-  background: white;
-  overflow: hidden;
+  background: #f9f9f9;
 }
 
+/* Seat style */
 .seat {
   position: absolute;
-  width: 50px;
-  height: 50px;
-  border: 1px solid black;
+  width: 48px;
+  height: 48px;
+  border: 1px solid #333;
+  background: #cfe3c8;
   display: flex;
-  justify-content: center;
   align-items: center;
-  background: lightgreen;
-  cursor: pointer;
+  justify-content: center;
   font-size: 14px;
+  cursor: pointer;
 }
 
 .booked {
@@ -38,98 +38,106 @@ body {
   color: white;
 }
 
-/* TOP */
+/* TOP 1-6 */
 #s1{top:20px; left:100px;}
-#s2{top:20px; left:160px;}
-#s3{top:20px; left:220px;}
-#s4{top:20px; left:280px;}
-#s5{top:20px; left:340px;}
-#s6{top:20px; left:400px;}
+#s2{top:20px; left:150px;}
+#s3{top:20px; left:200px;}
+#s4{top:20px; left:250px;}
+#s5{top:20px; left:300px;}
+#s6{top:20px; left:350px;}
 
-/* RIGHT TOP */
-#s7{top:120px; right:20px;}
-#s8{top:180px; right:20px;}
-#s9{top:240px; right:20px;}
+/* LEFT 13-15 */
+#s13{top:120px; left:40px;}
+#s14{top:170px; left:40px;}
+#s15{top:220px; left:40px;}
 
-/* CENTER */
-#s10{top:120px; left:230px;}
-#s11{top:180px; left:230px;}
-#s12{top:240px; left:230px;}
+/* CENTER 10-12 */
+#s10{top:120px; left:220px;}
+#s11{top:170px; left:220px;}
+#s12{top:220px; left:220px;}
 
-/* LEFT */
-#s13{top:120px; left:20px;}
-#s14{top:180px; left:20px;}
-#s15{top:240px; left:20px;}
+/* RIGHT 7-9 */
+#s7{top:120px; right:40px;}
+#s8{top:170px; right:40px;}
+#s9{top:220px; right:40px;}
 
-/* MIDDLE */
-#s16{top:300px; left:120px;}
-#s17{top:300px; left:180px;}
-#s18{top:300px; left:240px;}
-#s19{top:300px; left:300px;}
+/* 16-19 */
+#s16{top:280px; left:100px;}
+#s17{top:280px; left:150px;}
+#s18{top:280px; left:200px;}
+#s19{top:280px; left:250px;}
 
 /* 20-27 */
-#s20{top:360px; left:300px;}
-#s21{top:360px; left:240px;}
-#s22{top:360px; left:180px;}
-#s23{top:360px; left:120px;}
+#s23{top:360px; left:100px;}
+#s22{top:360px; left:150px;}
+#s21{top:360px; left:200px;}
+#s20{top:360px; left:250px;}
 
-#s24{top:420px; left:120px;}
-#s25{top:420px; left:180px;}
-#s26{top:420px; left:240px;}
-#s27{top:420px; left:300px;}
+#s24{top:410px; left:100px;}
+#s25{top:410px; left:150px;}
+#s26{top:410px; left:200px;}
+#s27{top:410px; left:250px;}
+
+/* RIGHT COLUMN 44-62 */
+#s44{top:280px; right:40px;}
+#s45{top:330px; right:40px;}
+#s46{top:380px; right:40px;}
+#s47{top:430px; right:40px;}
+#s48{top:480px; right:40px;}
+#s49{top:530px; right:40px;}
+#s50{top:580px; right:40px;}
+#s51{top:630px; right:40px;}
+#s52{top:680px; right:40px;}
+#s53{top:730px; right:40px;}
+#s54{top:780px; right:40px;}
+#s55{top:830px; right:40px;}
+#s56{top:880px; right:40px;}
+#s57{top:930px; right:40px;}
+#s58{top:980px; right:40px;}
+#s59{top:1030px; right:40px;}
+#s60{top:1080px; right:40px;}
+#s61{top:1130px; right:40px;}
+#s62{top:1180px; right:40px;}
 
 /* 28-37 */
-#s28{top:500px; left:300px;}
-#s29{top:500px; left:240px;}
-#s30{top:500px; left:180px;}
-#s31{top:500px; left:120px;}
+#s31{top:500px; left:100px;}
+#s30{top:500px; left:150px;}
+#s29{top:500px; left:200px;}
+#s28{top:500px; left:250px;}
 
-#s32{top:560px; left:120px;}
-#s33{top:560px; left:180px;}
-#s36{top:560px; left:240px;}
-#s37{top:560px; left:300px;}
+#s32{top:550px; left:100px;}
+#s33{top:550px; left:150px;}
+#s36{top:550px; left:200px;}
+#s37{top:550px; left:250px;}
 
 /* 34-43 */
-#s34{top:620px; left:120px;}
-#s35{top:620px; left:180px;}
-#s38{top:620px; left:240px;}
-#s39{top:620px; left:300px;}
+#s34{top:650px; left:100px;}
+#s35{top:650px; left:150px;}
+#s38{top:650px; left:200px;}
+#s39{top:650px; left:250px;}
 
-#s40{top:680px; left:120px;}
-#s41{top:680px; left:180px;}
-#s42{top:680px; left:240px;}
-#s43{top:680px; left:300px;}
+#s40{top:700px; left:100px;}
+#s41{top:700px; left:150px;}
+#s42{top:700px; left:200px;}
+#s43{top:700px; left:250px;}
 
-/* LEFT BOTTOM */
-#s63{top:800px; left:40px;}
-#s64{top:860px; left:40px;}
+/* 63-64 */
+#s63{top:780px; left:70px;}
+#s64{top:830px; left:70px;}
 
-/* RIGHT COLUMN (FULLY INSIDE NOW) */
-#s44{top:300px; right:20px;}
-#s45{top:350px; right:20px;}
-#s46{top:400px; right:20px;}
-#s47{top:450px; right:20px;}
-#s48{top:500px; right:20px;}
-#s49{top:550px; right:20px;}
-#s50{top:600px; right:20px;}
-#s51{top:650px; right:20px;}
-#s52{top:700px; right:20px;}
-#s53{top:750px; right:20px;}
-#s54{top:800px; right:20px;}
-#s55{top:850px; right:20px;}
-#s56{top:900px; right:20px;}
-#s57{top:950px; right:20px;}
-#s58{top:1000px; right:20px;}
-#s59{top:1040px; right:20px;}
-#s60{top:1080px; right:20px;}
-#s61{top:1120px; right:20px;}
-#s62{top:1160px; right:20px;}
+/* Entrance */
+.entrance {
+  position: absolute;
+  bottom: 10px;
+  left: 200px;
+  font-size: 14px;
+}
 </style>
 </head>
 
 <body>
 
-<h2>📚 64 Seat Library Layout</h2>
+<h2>📚 64 Seat Layout</h2>
 
 <div class="room">
 <script>
@@ -137,6 +145,9 @@ for(let i=1;i<=64;i++){
   document.write(`<div class="seat" id="s${i}">${i}</div>`);
 }
 </script>
+
+<div class="entrance">Entrance</div>
+
 </div>
 
 <script>
