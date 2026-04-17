@@ -3,8 +3,6 @@
 <head>
 <title>Shree Shyam Library</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <style>
 body { font-family: Arial; text-align: center; }
 
@@ -28,12 +26,7 @@ body { font-family: Arial; text-align: center; }
   justify-content: center;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 11px;
 }
-
-.complete { background: red; }
-.due { background: orange; }
-.expired { background: skyblue; }
 </style>
 </head>
 
@@ -47,9 +40,15 @@ body { font-family: Arial; text-align: center; }
 
 let pos = {
   1:[20,100],2:[20,160],3:[20,220],4:[20,280],5:[20,340],6:[20,400],
-  7:[120,'right'],8:[180,'right'],9:[240,'right'],
+
+  /* 🔥 7-8-9 NO GAP */
+  7:[120,'right'],
+  8:[165,'right'],
+  9:[210,'right'],
 
   10:[120,230],11:[180,230],12:[240,230],
+
+  /* 🔥 LEFT FIX BACK */
   13:[120,60],14:[180,60],15:[240,60],
 
   16:[300,110],17:[300,170],18:[300,230],19:[300,290],
@@ -66,9 +65,9 @@ let pos = {
   63:[780,60],64:[840,60]
 };
 
-/* 🔥 ONLY RIGHT SIDE COMPRESSED */
+/* 🔥 RIGHT SIDE COMPRESSED */
 let y = 300;
-let gap = 40;  // 👈 compress
+let gap = 40;
 
 for(let i=44;i<=62;i++){
   pos[i] = [y, 'right'];
