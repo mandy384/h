@@ -1,36 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Library Seat System</title>
+<title>64 Seat Layout</title>
 
 <style>
 body {
   font-family: Arial;
+  background: #f4f4f4;
   text-align: center;
-  background: #f5f5f5;
 }
 
-.container {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.layout {
-  display: grid;
-  grid-template-columns: repeat(10, 40px);
-  gap: 8px;
+.room {
+  position: relative;
+  width: 600px;
+  height: 900px;
+  margin: auto;
+  border: 3px solid black;
+  background: white;
 }
 
 .seat {
+  position: absolute;
   width: 40px;
   height: 40px;
-  border: 1px solid #000;
+  border: 1px solid black;
   display: flex;
-  align-items: center;
   justify-content: center;
-  cursor: pointer;
+  align-items: center;
   background: lightgreen;
+  cursor: pointer;
   font-size: 12px;
 }
 
@@ -39,112 +37,107 @@ body {
   color: white;
 }
 
-.empty {
-  visibility: hidden;
-}
+/* TOP ROW */
+#s1{top:20px; left:120px;}
+#s2{top:20px; left:170px;}
+#s3{top:20px; left:220px;}
+#s4{top:20px; left:270px;}
+#s5{top:20px; left:320px;}
+#s6{top:20px; left:370px;}
+
+/* RIGHT TOP */
+#s7{top:120px; right:40px;}
+#s8{top:170px; right:40px;}
+#s9{top:220px; right:40px;}
+
+/* CENTER */
+#s10{top:120px; left:260px;}
+#s11{top:170px; left:260px;}
+#s12{top:220px; left:260px;}
+
+/* LEFT TOP */
+#s13{top:120px; left:40px;}
+#s14{top:170px; left:40px;}
+#s15{top:220px; left:40px;}
+
+/* MIDDLE LINE */
+#s16{top:280px; left:120px;}
+#s17{top:280px; left:170px;}
+#s18{top:280px; left:220px;}
+#s19{top:280px; left:270px;}
+
+/* BLOCK 20-27 */
+#s20{top:350px; left:270px;}
+#s21{top:350px; left:220px;}
+#s22{top:350px; left:170px;}
+#s23{top:350px; left:120px;}
+
+#s24{top:400px; left:120px;}
+#s25{top:400px; left:170px;}
+#s26{top:400px; left:220px;}
+#s27{top:400px; left:270px;}
+
+/* BLOCK 28-37 */
+#s28{top:500px; left:270px;}
+#s29{top:500px; left:220px;}
+#s30{top:500px; left:170px;}
+#s31{top:500px; left:120px;}
+
+#s32{top:550px; left:120px;}
+#s33{top:550px; left:170px;}
+#s36{top:550px; left:220px;}
+#s37{top:550px; left:270px;}
+
+/* BLOCK 34-43 */
+#s34{top:650px; left:120px;}
+#s35{top:650px; left:170px;}
+#s38{top:650px; left:220px;}
+#s39{top:650px; left:270px;}
+
+#s40{top:700px; left:120px;}
+#s41{top:700px; left:170px;}
+#s42{top:700px; left:220px;}
+#s43{top:700px; left:270px;}
+
+/* LEFT BOTTOM */
+#s63{top:750px; left:60px;}
+#s64{top:800px; left:60px;}
+
+/* RIGHT LONG COLUMN */
+#s44{top:280px; right:40px;}
+#s45{top:320px; right:40px;}
+#s46{top:360px; right:40px;}
+#s47{top:400px; right:40px;}
+#s48{top:440px; right:40px;}
+#s49{top:480px; right:40px;}
+#s50{top:520px; right:40px;}
+#s51{top:560px; right:40px;}
+#s52{top:600px; right:40px;}
+#s53{top:640px; right:40px;}
+#s54{top:680px; right:40px;}
+#s55{top:720px; right:40px;}
+#s56{top:760px; right:40px;}
+#s57{top:800px; right:40px;}
+#s58{top:840px; right:40px;}
+#s59{top:880px; right:40px;}
+#s60{top:920px; right:40px;}
+#s61{top:960px; right:40px;}
+#s62{top:1000px; right:40px;}
 </style>
 </head>
 
 <body>
 
-<h2>📚 Library Seat Management (64 Seats)</h2>
+<h2>📚 64 Seat Library Layout</h2>
 
-<div class="container">
-<div class="layout">
+<div class="room">
 
-<!-- Row 1 -->
-<div class="seat">1</div>
-<div class="seat">2</div>
-<div class="seat">3</div>
-<div class="seat">4</div>
-<div class="seat">5</div>
-<div class="seat">6</div>
+<script>
+for(let i=1;i<=64;i++){
+  document.write(`<div class="seat" id="s${i}">${i}</div>`);
+}
+</script>
 
-<!-- Empty -->
-<div class="empty"></div>
-<div class="empty"></div>
-
-<!-- Right -->
-<div class="seat">7</div>
-<div class="seat">8</div>
-<div class="seat">9</div>
-
-<!-- Middle -->
-<div class="empty"></div>
-<div class="seat">10</div>
-<div class="seat">11</div>
-<div class="seat">12</div>
-
-<!-- Left -->
-<div class="seat">13</div>
-<div class="seat">14</div>
-<div class="seat">15</div>
-
-<!-- Center Line -->
-<div class="seat">16</div>
-<div class="seat">17</div>
-<div class="seat">18</div>
-<div class="seat">19</div>
-
-<!-- Block -->
-<div class="seat">20</div>
-<div class="seat">21</div>
-<div class="seat">22</div>
-<div class="seat">23</div>
-
-<div class="seat">24</div>
-<div class="seat">25</div>
-<div class="seat">26</div>
-<div class="seat">27</div>
-
-<!-- Next -->
-<div class="seat">28</div>
-<div class="seat">29</div>
-<div class="seat">30</div>
-<div class="seat">31</div>
-
-<div class="seat">32</div>
-<div class="seat">33</div>
-<div class="seat">36</div>
-<div class="seat">37</div>
-
-<!-- Bottom -->
-<div class="seat">34</div>
-<div class="seat">35</div>
-<div class="seat">38</div>
-<div class="seat">39</div>
-
-<div class="seat">40</div>
-<div class="seat">41</div>
-<div class="seat">42</div>
-<div class="seat">43</div>
-
-<!-- Left Bottom -->
-<div class="seat">63</div>
-<div class="seat">64</div>
-
-<!-- Right Long Line -->
-<div class="seat">44</div>
-<div class="seat">45</div>
-<div class="seat">46</div>
-<div class="seat">47</div>
-<div class="seat">48</div>
-<div class="seat">49</div>
-<div class="seat">50</div>
-<div class="seat">51</div>
-<div class="seat">52</div>
-<div class="seat">53</div>
-<div class="seat">54</div>
-<div class="seat">55</div>
-<div class="seat">56</div>
-<div class="seat">57</div>
-<div class="seat">58</div>
-<div class="seat">59</div>
-<div class="seat">60</div>
-<div class="seat">61</div>
-<div class="seat">62</div>
-
-</div>
 </div>
 
 <script>
