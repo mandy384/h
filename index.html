@@ -8,18 +8,10 @@
 <style>
 body { font-family: Arial; text-align: center; }
 
-.dashboard {
-  background: black;
-  color: white;
-  padding: 10px;
-  margin: 10px;
-  border-radius: 10px;
-}
-
 #seats {
   position: relative;
   width: 520px;
-  height: 1150px;
+  height: 1050px;
   margin: auto;
   border: 3px solid black;
   background: #f9f9f9;
@@ -27,8 +19,8 @@ body { font-family: Arial; text-align: center; }
 
 .seat {
   position: absolute;
-  width: 50px;
-  height: 50px;
+  width: 48px;
+  height: 48px;
   background: green;
   color: white;
   display: flex;
@@ -42,17 +34,6 @@ body { font-family: Arial; text-align: center; }
 .complete { background: red; }
 .due { background: orange; }
 .expired { background: skyblue; }
-
-#form, #details {
-  display: none;
-  background: #eee;
-  padding: 10px;
-  margin: 10px;
-  border-radius: 10px;
-}
-
-input, select { margin: 5px; padding: 5px; width: 90%; }
-button { margin: 5px; padding: 8px; }
 </style>
 </head>
 
@@ -60,161 +41,57 @@ button { margin: 5px; padding: 8px; }
 
 <h2>📚 Shree Shyam Library</h2>
 
-<div class="dashboard">
-<p id="stats"></p>
-</div>
-
-<button onclick="downloadPDF()">📄 Full Report</button>
-
-<h3>⚠️ Due / Expired</h3>
-<div id="dueList"></div>
-
 <div id="seats"></div>
-
-<!-- FORM -->
-<div id="form">
-<input id="name" placeholder="Name">
-<input id="father" placeholder="Father Name">
-<input id="mobile" placeholder="Mobile">
-<input id="adhar" placeholder="Aadhar">
-<input id="shift" placeholder="Shift">
-<input id="from" type="date">
-<input id="to" type="date">
-
-<select id="payment">
-<option>Cash</option>
-<option>Online</option>
-</select>
-
-<input id="totalFee" placeholder="Total Fee">
-<input id="paid" placeholder="Paid">
-
-<button onclick="saveData()">Save</button>
-</div>
-
-<!-- DETAILS -->
-<div id="details">
-<pre id="showData"></pre>
-<button onclick="editData()">Edit</button>
-<button onclick="deleteData()">Reset</button>
-<button onclick="sendMsg()">📩 SMS</button>
-<button onclick="downloadReceipt()">🧾 Receipt</button>
-</div>
 
 <script>
 
-const API = "https://69e0a2c429c070e6597bc6bf.mockapi.io/wisdomnestlibrary";
-
-let savedSeats = {};
-let currentSeat = null;
-
-// 🔥 CUSTOM POSITION LAYOUT
-const pos = {
+let pos = {
   1:[20,100],2:[20,160],3:[20,220],4:[20,280],5:[20,340],6:[20,400],
   7:[120,'right'],8:[180,'right'],9:[240,'right'],
+
   10:[120,230],11:[180,230],12:[240,230],
   13:[120,60],14:[180,60],15:[240,60],
+
   16:[300,110],17:[300,170],18:[300,230],19:[300,290],
-  20:[370,290],21:[370,230],22:[370,170],23:[370,110],
-  24:[430,110],25:[430,170],26:[430,230],27:[430,290],
-  28:[520,290],29:[520,230],30:[520,170],31:[520,110],
-  32:[580,110],33:[580,170],36:[580,230],37:[580,290],
-  34:[680,110],35:[680,170],38:[680,230],39:[680,290],
-  40:[740,110],41:[740,170],42:[740,230],43:[740,290],
-  63:[850,60],64:[910,60]
+
+  20:[360,290],21:[360,230],22:[360,170],23:[360,110],
+  24:[420,110],25:[420,170],26:[420,230],27:[420,290],
+
+  28:[480,290],29:[480,230],30:[480,170],31:[480,110],
+  32:[540,110],33:[540,170],36:[540,230],37:[540,290],
+
+  34:[620,110],35:[620,170],38:[620,230],39:[620,290],
+  40:[680,110],41:[680,170],42:[680,230],43:[680,290],
+
+  63:[780,60],64:[840,60]
 };
 
-let y=300;
+/* 🔥 ONLY RIGHT SIDE COMPRESSED */
+let y = 300;
+let gap = 40;  // 👈 compress
+
 for(let i=44;i<=62;i++){
-  pos[i]=[y,'right'];
-  y+=60;
+  pos[i] = [y, 'right'];
+  y += gap;
 }
 
-// LOAD
-async function loadData(){
-  let res = await fetch(API);
-  let arr = await res.json();
-  savedSeats = {};
-  arr.forEach(d=> savedSeats[d.seat] = d);
-  renderSeats();
+/* RENDER */
+for(let i=1;i<=64;i++){
+  let seat=document.createElement("div");
+  seat.className="seat";
+
+  let p=pos[i];
+  if(!p) continue;
+
+  seat.innerText=i;
+  seat.style.top=p[0]+"px";
+
+  if(p[1]=='right') seat.style.right="50px";
+  else seat.style.left=p[1]+"px";
+
+  document.getElementById("seats").appendChild(seat);
 }
 
-// RENDER
-function renderSeats(){
-  seats.innerHTML="";
-  let occupied=0,totalPaid=0,totalDue=0;
-  let today=new Date().toISOString().split("T")[0];
-
-  for(let i=1;i<=64;i++){
-    let seat=document.createElement("div");
-    seat.className="seat";
-
-    let p=pos[i];
-    if(!p) continue;
-
-    seat.style.top=p[0]+"px";
-    if(p[1]==='right') seat.style.right="60px";
-    else seat.style.left=p[1]+"px";
-
-    if(savedSeats[i]){
-      let d=savedSeats[i];
-      seat.innerHTML=`<div><b>${i}</b><br>${d.name}</div>`;
-
-      if(d.to && d.to<today) seat.classList.add("expired");
-      else if(d.due>0) seat.classList.add("due");
-      else seat.classList.add("complete");
-
-      occupied++;
-      totalPaid+=Number(d.paid||0);
-      totalDue+=Number(d.due||0);
-    }else{
-      seat.innerHTML=`<div><b>${i}</b></div>`;
-    }
-
-    seat.onclick=()=>{
-      currentSeat=i;
-      if(savedSeats[i]) showDetails(i);
-      else form.style.display="block";
-    };
-
-    seats.appendChild(seat);
-  }
-
-  stats.innerText=
-  "Seats: 64 | Occupied: "+occupied+
-  " | Paid: ₹"+totalPaid+
-  " | Due: ₹"+totalDue;
-
-  updateDueList();
-}
-
-// 🔥 SMS UPDATED
-function sendMsg(){
-let d=savedSeats[currentSeat];
-
-let msg=`📚 Shree Shyam Library
-${d.name}
-Seat:${currentSeat}
-Due: ₹${d.due}`;
-
-window.location.href=`sms:${d.mobile}?body=${encodeURIComponent(msg)}`;
-}
-
-function updateDueList(){
-dueList.innerHTML="";
-let today=new Date().toISOString().split("T")[0];
-
-for(let i in savedSeats){
-let d=savedSeats[i];
-if((d.to && d.to<today)||d.due>0){
-let div=document.createElement("div");
-div.innerText="Seat "+i+" | "+d.name+" | ₹"+d.due;
-dueList.appendChild(div);
-}
-}
-}
-
-loadData();
 </script>
 
 </body>
