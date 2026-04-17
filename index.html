@@ -1,309 +1,160 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Library Ultimate Pro</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<title>Library Seat System</title>
 
 <style>
-body { font-family: Arial; text-align: center; }
-
-.dashboard {
-  background: black;
-  color: white;
-  padding: 10px;
-  margin: 10px;
-  border-radius: 10px;
+body {
+  font-family: Arial;
+  text-align: center;
+  background: #f5f5f5;
 }
 
-#seats {
-  display: grid;
-  grid-template-columns: repeat(8, 100px);
-  gap: 8px;
+.container {
+  display: flex;
   justify-content: center;
+  margin-top: 20px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: repeat(10, 40px);
+  gap: 8px;
 }
 
 .seat {
-  height: 90px;
-  background: green;
-  color: white;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #000;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
   cursor: pointer;
-  font-size: 11px;
+  background: lightgreen;
+  font-size: 12px;
 }
 
-.complete { background: red; }
-.due { background: orange; }
-.expired { background: skyblue; }
-
-#form, #details {
-  display: none;
-  background: #eee;
-  padding: 10px;
-  margin: 10px;
-  border-radius: 10px;
+.booked {
+  background: red;
+  color: white;
 }
 
-input, select { margin: 5px; padding: 5px; width: 90%; }
-button { margin: 5px; padding: 8px; }
-
-.empty { visibility: hidden; }
+.empty {
+  visibility: hidden;
+}
 </style>
 </head>
 
 <body>
 
-<h2>📚 Library Ultimate Pro</h2>
+<h2>📚 Library Seat Management (64 Seats)</h2>
 
-<div class="dashboard">
-<p id="stats"></p>
+<div class="container">
+<div class="layout">
+
+<!-- Row 1 -->
+<div class="seat">1</div>
+<div class="seat">2</div>
+<div class="seat">3</div>
+<div class="seat">4</div>
+<div class="seat">5</div>
+<div class="seat">6</div>
+
+<!-- Empty -->
+<div class="empty"></div>
+<div class="empty"></div>
+
+<!-- Right -->
+<div class="seat">7</div>
+<div class="seat">8</div>
+<div class="seat">9</div>
+
+<!-- Middle -->
+<div class="empty"></div>
+<div class="seat">10</div>
+<div class="seat">11</div>
+<div class="seat">12</div>
+
+<!-- Left -->
+<div class="seat">13</div>
+<div class="seat">14</div>
+<div class="seat">15</div>
+
+<!-- Center Line -->
+<div class="seat">16</div>
+<div class="seat">17</div>
+<div class="seat">18</div>
+<div class="seat">19</div>
+
+<!-- Block -->
+<div class="seat">20</div>
+<div class="seat">21</div>
+<div class="seat">22</div>
+<div class="seat">23</div>
+
+<div class="seat">24</div>
+<div class="seat">25</div>
+<div class="seat">26</div>
+<div class="seat">27</div>
+
+<!-- Next -->
+<div class="seat">28</div>
+<div class="seat">29</div>
+<div class="seat">30</div>
+<div class="seat">31</div>
+
+<div class="seat">32</div>
+<div class="seat">33</div>
+<div class="seat">36</div>
+<div class="seat">37</div>
+
+<!-- Bottom -->
+<div class="seat">34</div>
+<div class="seat">35</div>
+<div class="seat">38</div>
+<div class="seat">39</div>
+
+<div class="seat">40</div>
+<div class="seat">41</div>
+<div class="seat">42</div>
+<div class="seat">43</div>
+
+<!-- Left Bottom -->
+<div class="seat">63</div>
+<div class="seat">64</div>
+
+<!-- Right Long Line -->
+<div class="seat">44</div>
+<div class="seat">45</div>
+<div class="seat">46</div>
+<div class="seat">47</div>
+<div class="seat">48</div>
+<div class="seat">49</div>
+<div class="seat">50</div>
+<div class="seat">51</div>
+<div class="seat">52</div>
+<div class="seat">53</div>
+<div class="seat">54</div>
+<div class="seat">55</div>
+<div class="seat">56</div>
+<div class="seat">57</div>
+<div class="seat">58</div>
+<div class="seat">59</div>
+<div class="seat">60</div>
+<div class="seat">61</div>
+<div class="seat">62</div>
+
 </div>
-
-<button onclick="downloadPDF()">📄 Full Report</button>
-<button onclick="monthlyReport()">📊 Monthly Report</button>
-
-<h3>⚠️ Due / Expired</h3>
-<div id="dueList"></div>
-
-<div id="seats"></div>
-
-<!-- FORM -->
-<div id="form">
-<input id="name" placeholder="Name">
-<input id="father" placeholder="Father Name">
-<input id="mobile" placeholder="Mobile">
-<input id="adhar" placeholder="Aadhar">
-<input id="shift" placeholder="Shift">
-<input id="from" type="date">
-<input id="to" type="date">
-
-<select id="payment">
-<option>Cash</option>
-<option>Online</option>
-</select>
-
-<input id="totalFee" placeholder="Total Fee">
-<input id="paid" placeholder="Paid">
-
-<button onclick="saveData()">Save</button>
-</div>
-
-<!-- DETAILS -->
-<div id="details">
-<pre id="showData"></pre>
-<button onclick="editData()">Edit</button>
-<button onclick="deleteData()">Reset</button>
-<button onclick="sendMsg()">📩 SMS Reminder</button>
-<button onclick="downloadReceipt()">🧾 Receipt</button>
 </div>
 
 <script>
-let seatsDiv = document.getElementById("seats");
-let savedSeats = JSON.parse(localStorage.getItem("seats")) || {};
-let currentSeat = null;
+let seats = document.querySelectorAll(".seat");
 
-const layout = [
-[8,7,6,5,4,3,2,1],
-[9,10,11,12,0,13,14,15],
-[22,21,20,19,0,18,17,16],
-[23,24,25,0,0,26,27,28],
-[35,34,33,32,0,31,30,29],
-[36,37,38,39,0,40,41,42],
-[48,47,46,0,0,45,44,43],
-[49,50,51,0,0,52,53,54],
-[60,59,58,57,0,0,56,55]
-];
-
-function renderSeats() {
-  seatsDiv.innerHTML = "";
-
-  let occupied=0,totalPaid=0,totalDue=0;
-  let today = new Date().toISOString().split("T")[0];
-
-  layout.forEach(row=>{
-    row.forEach(i=>{
-      let seat=document.createElement("div");
-
-      if(i===0){
-        seat.className="empty";
-      }else{
-        seat.className="seat";
-
-        if(savedSeats[i]){
-          let d=savedSeats[i];
-          seat.innerHTML = i+"<br>"+d.name;
-
-          if(d.to && d.to<today) seat.classList.add("expired");
-          else if(d.due>0) seat.classList.add("due");
-          else seat.classList.add("complete");
-
-          occupied++;
-          totalPaid+=Number(d.paid||0);
-          totalDue+=Number(d.due||0);
-        }else{
-          seat.innerText="Seat "+i;
-        }
-
-        seat.onclick=()=>{
-          currentSeat=i;
-          if(savedSeats[i]) showDetails(i);
-          else form.style.display="block";
-        };
-      }
-
-      seatsDiv.appendChild(seat);
-    });
+seats.forEach(seat => {
+  seat.addEventListener("click", () => {
+    seat.classList.toggle("booked");
   });
-
-  stats.innerText=
-  "Seats: 60 | Occupied: "+occupied+
-  " | Empty: "+(60-occupied)+
-  " | Paid: ₹"+totalPaid+
-  " | Due: ₹"+totalDue;
-
-  updateDueList();
-}
-
-// SAVE
-function saveData(){
-  let totalFee=Number(totalFeeInput.value);
-  let paid=Number(paidInput.value);
-
-  savedSeats[currentSeat]={
-    name:name.value,
-    father:father.value,
-    mobile:mobile.value,
-    adhar:adhar.value,
-    shift:shift.value,
-    from:from.value,
-    to:to.value,
-    payment:payment.value,
-    totalFee,
-    paid,
-    due:totalFee-paid
-  };
-
-  localStorage.setItem("seats",JSON.stringify(savedSeats));
-  form.style.display="none";
-  renderSeats();
-}
-
-// ✅ SMS FUNCTION
-function sendMsg(){
-  let d = savedSeats[currentSeat];
-
-  let msg = `Hello ${d.name},
-Your library fee due is ₹${d.due}.
-Please pay soon.`;
-
-  window.location.href = `sms:${d.mobile}?body=${encodeURIComponent(msg)}`;
-}
-
-// बाकी SAME
-function showDetails(i){
-let d=savedSeats[i];
-showData.innerText=`Seat: ${i}
-Name: ${d.name}
-Father: ${d.father}
-Mobile: ${d.mobile}
-Aadhar: ${d.adhar}
-Shift: ${d.shift}
-From: ${d.from}
-To: ${d.to}
-Payment: ${d.payment}
-Total: ₹${d.totalFee}
-Paid: ₹${d.paid}
-Due: ₹${d.due}`;
-details.style.display="block";
-form.style.display="none";
-}
-
-function editData(){
-let d=savedSeats[currentSeat];
-name.value=d.name;
-father.value=d.father;
-mobile.value=d.mobile;
-adhar.value=d.adhar;
-shift.value=d.shift;
-from.value=d.from;
-to.value=d.to;
-payment.value=d.payment;
-totalFeeInput.value=d.totalFee;
-paidInput.value=d.paid;
-form.style.display="block";
-details.style.display="none";
-}
-
-function deleteData(){
-delete savedSeats[currentSeat];
-localStorage.setItem("seats",JSON.stringify(savedSeats));
-details.style.display="none";
-renderSeats();
-}
-
-function updateDueList(){
-dueList.innerHTML="";
-let today=new Date().toISOString().split("T")[0];
-
-for(let i in savedSeats){
-let d=savedSeats[i];
-
-if((d.to && d.to<today)||d.due>0){
-let div=document.createElement("div");
-div.innerText="Seat "+i+" | "+d.name+" | Due ₹"+d.due;
-dueList.appendChild(div);
-}
-}
-}
-
-// PDF SAME
-function downloadPDF(){
-const { jsPDF } = window.jspdf;
-let doc=new jsPDF(),y=10;
-
-for(let i in savedSeats){
-let d=savedSeats[i];
-doc.text(`Seat ${i} ${d.name} ₹${d.paid}`,10,y);
-y+=8;
-}
-doc.save("report.pdf");
-}
-
-function monthlyReport(){
-downloadPDF();
-}
-
-function downloadReceipt(){
-const { jsPDF } = window.jspdf;
-let doc=new jsPDF();
-let d=savedSeats[currentSeat];
-
-doc.text("Receipt",10,10);
-doc.text(d.name,10,20);
-doc.save("receipt.pdf");
-}
-
-// refs
-let name=document.getElementById("name");
-let father=document.getElementById("father");
-let mobile=document.getElementById("mobile");
-let adhar=document.getElementById("adhar");
-let shift=document.getElementById("shift");
-let from=document.getElementById("from");
-let to=document.getElementById("to");
-let payment=document.getElementById("payment");
-let totalFeeInput=document.getElementById("totalFee");
-let paidInput=document.getElementById("paid");
-let form=document.getElementById("form");
-let details=document.getElementById("details");
-let stats=document.getElementById("stats");
-let dueList=document.getElementById("dueList");
-let showData=document.getElementById("showData");
-
-renderSeats();
+});
 </script>
 
 </body>
