@@ -1,160 +1,220 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>64 Seat Layout</title>
+<title>Shree Shyam Library</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-body {
-  font-family: Arial;
-  background: #eee;
-  text-align: center;
+body { font-family: Arial; text-align: center; }
+
+.dashboard {
+  background: black;
+  color: white;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
 }
 
-.room {
+#seats {
   position: relative;
   width: 520px;
   height: 1150px;
   margin: auto;
-  border: 4px solid black;
+  border: 3px solid black;
   background: #f9f9f9;
 }
 
-/* Seat (NO OUTLINE) */
 .seat {
   position: absolute;
   width: 50px;
   height: 50px;
-  background: #2e7d32;
+  background: green;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  cursor: pointer;
   border-radius: 6px;
+  cursor: pointer;
+  font-size: 11px;
 }
 
-/* Click = booked */
-.booked {
-  background: red;
+.complete { background: red; }
+.due { background: orange; }
+.expired { background: skyblue; }
+
+#form, #details {
+  display: none;
+  background: #eee;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
 }
 
-/* TOP */
-#s1{top:20px; left:100px;}
-#s2{top:20px; left:160px;}
-#s3{top:20px; left:220px;}
-#s4{top:20px; left:280px;}
-#s5{top:20px; left:340px;}
-#s6{top:20px; left:400px;}
-
-/* LEFT */
-#s13{top:120px; left:60px;}
-#s14{top:180px; left:60px;}
-#s15{top:240px; left:60px;}
-
-/* CENTER */
-#s10{top:120px; left:230px;}
-#s11{top:180px; left:230px;}
-#s12{top:240px; left:230px;}
-
-/* RIGHT */
-#s7{top:120px; right:60px;}
-#s8{top:180px; right:60px;}
-#s9{top:240px; right:60px;}
-
-/* MIDDLE */
-#s16{top:300px; left:110px;}
-#s17{top:300px; left:170px;}
-#s18{top:300px; left:230px;}
-#s19{top:300px; left:290px;}
-
-/* 20-27 */
-#s23{top:370px; left:110px;}
-#s22{top:370px; left:170px;}
-#s21{top:370px; left:230px;}
-#s20{top:370px; left:290px;}
-
-#s24{top:430px; left:110px;}
-#s25{top:430px; left:170px;}
-#s26{top:430px; left:230px;}
-#s27{top:430px; left:290px;}
-
-/* 28-37 */
-#s31{top:520px; left:110px;}
-#s30{top:520px; left:170px;}
-#s29{top:520px; left:230px;}
-#s28{top:520px; left:290px;}
-
-#s32{top:580px; left:110px;}
-#s33{top:580px; left:170px;}
-#s36{top:580px; left:230px;}
-#s37{top:580px; left:290px;}
-
-/* 34-43 */
-#s34{top:680px; left:110px;}
-#s35{top:680px; left:170px;}
-#s38{top:680px; left:230px;}
-#s39{top:680px; left:290px;}
-
-#s40{top:740px; left:110px;}
-#s41{top:740px; left:170px;}
-#s42{top:740px; left:230px;}
-#s43{top:740px; left:290px;}
-
-/* 63-64 */
-#s63{top:850px; left:60px;}
-#s64{top:910px; left:60px;}
-
-/* RIGHT COLUMN */
-#s44{top:300px; right:60px;}
-#s45{top:360px; right:60px;}
-#s46{top:420px; right:60px;}
-#s47{top:480px; right:60px;}
-#s48{top:540px; right:60px;}
-#s49{top:600px; right:60px;}
-#s50{top:660px; right:60px;}
-#s51{top:720px; right:60px;}
-#s52{top:780px; right:60px;}
-#s53{top:840px; right:60px;}
-#s54{top:900px; right:60px;}
-#s55{top:960px; right:60px;}
-#s56{top:1020px; right:60px;}
-#s57{top:1080px; right:60px;}
-#s58{top:1140px; right:60px;}
-#s59{top:1200px; right:60px;}
-#s60{top:1260px; right:60px;}
-#s61{top:1320px; right:60px;}
-#s62{top:1380px; right:60px;}
-
-/* Entrance */
-.entrance {
-  position: absolute;
-  bottom: 10px;
-  left: 210px;
-}
+input, select { margin: 5px; padding: 5px; width: 90%; }
+button { margin: 5px; padding: 8px; }
 </style>
 </head>
 
 <body>
 
-<h2>📚 64 Seat Layout</h2>
+<h2>📚 Shree Shyam Library</h2>
 
-<div class="room">
+<div class="dashboard">
+<p id="stats"></p>
+</div>
 
-<script>
-for(let i=1;i<=64;i++){
-  document.write(`<div class="seat" id="s${i}">${i}</div>`);
-}
-</script>
+<button onclick="downloadPDF()">📄 Full Report</button>
 
-<div class="entrance">Entrance</div>
+<h3>⚠️ Due / Expired</h3>
+<div id="dueList"></div>
 
+<div id="seats"></div>
+
+<!-- FORM -->
+<div id="form">
+<input id="name" placeholder="Name">
+<input id="father" placeholder="Father Name">
+<input id="mobile" placeholder="Mobile">
+<input id="adhar" placeholder="Aadhar">
+<input id="shift" placeholder="Shift">
+<input id="from" type="date">
+<input id="to" type="date">
+
+<select id="payment">
+<option>Cash</option>
+<option>Online</option>
+</select>
+
+<input id="totalFee" placeholder="Total Fee">
+<input id="paid" placeholder="Paid">
+
+<button onclick="saveData()">Save</button>
+</div>
+
+<!-- DETAILS -->
+<div id="details">
+<pre id="showData"></pre>
+<button onclick="editData()">Edit</button>
+<button onclick="deleteData()">Reset</button>
+<button onclick="sendMsg()">📩 SMS</button>
+<button onclick="downloadReceipt()">🧾 Receipt</button>
 </div>
 
 <script>
-document.querySelectorAll(".seat").forEach(seat=>{
-  seat.onclick = ()=> seat.classList.toggle("booked");
-});
+
+const API = "https://69e0a2c429c070e6597bc6bf.mockapi.io/wisdomnestlibrary";
+
+let savedSeats = {};
+let currentSeat = null;
+
+// 🔥 CUSTOM POSITION LAYOUT
+const pos = {
+  1:[20,100],2:[20,160],3:[20,220],4:[20,280],5:[20,340],6:[20,400],
+  7:[120,'right'],8:[180,'right'],9:[240,'right'],
+  10:[120,230],11:[180,230],12:[240,230],
+  13:[120,60],14:[180,60],15:[240,60],
+  16:[300,110],17:[300,170],18:[300,230],19:[300,290],
+  20:[370,290],21:[370,230],22:[370,170],23:[370,110],
+  24:[430,110],25:[430,170],26:[430,230],27:[430,290],
+  28:[520,290],29:[520,230],30:[520,170],31:[520,110],
+  32:[580,110],33:[580,170],36:[580,230],37:[580,290],
+  34:[680,110],35:[680,170],38:[680,230],39:[680,290],
+  40:[740,110],41:[740,170],42:[740,230],43:[740,290],
+  63:[850,60],64:[910,60]
+};
+
+let y=300;
+for(let i=44;i<=62;i++){
+  pos[i]=[y,'right'];
+  y+=60;
+}
+
+// LOAD
+async function loadData(){
+  let res = await fetch(API);
+  let arr = await res.json();
+  savedSeats = {};
+  arr.forEach(d=> savedSeats[d.seat] = d);
+  renderSeats();
+}
+
+// RENDER
+function renderSeats(){
+  seats.innerHTML="";
+  let occupied=0,totalPaid=0,totalDue=0;
+  let today=new Date().toISOString().split("T")[0];
+
+  for(let i=1;i<=64;i++){
+    let seat=document.createElement("div");
+    seat.className="seat";
+
+    let p=pos[i];
+    if(!p) continue;
+
+    seat.style.top=p[0]+"px";
+    if(p[1]==='right') seat.style.right="60px";
+    else seat.style.left=p[1]+"px";
+
+    if(savedSeats[i]){
+      let d=savedSeats[i];
+      seat.innerHTML=`<div><b>${i}</b><br>${d.name}</div>`;
+
+      if(d.to && d.to<today) seat.classList.add("expired");
+      else if(d.due>0) seat.classList.add("due");
+      else seat.classList.add("complete");
+
+      occupied++;
+      totalPaid+=Number(d.paid||0);
+      totalDue+=Number(d.due||0);
+    }else{
+      seat.innerHTML=`<div><b>${i}</b></div>`;
+    }
+
+    seat.onclick=()=>{
+      currentSeat=i;
+      if(savedSeats[i]) showDetails(i);
+      else form.style.display="block";
+    };
+
+    seats.appendChild(seat);
+  }
+
+  stats.innerText=
+  "Seats: 64 | Occupied: "+occupied+
+  " | Paid: ₹"+totalPaid+
+  " | Due: ₹"+totalDue;
+
+  updateDueList();
+}
+
+// 🔥 SMS UPDATED
+function sendMsg(){
+let d=savedSeats[currentSeat];
+
+let msg=`📚 Shree Shyam Library
+${d.name}
+Seat:${currentSeat}
+Due: ₹${d.due}`;
+
+window.location.href=`sms:${d.mobile}?body=${encodeURIComponent(msg)}`;
+}
+
+function updateDueList(){
+dueList.innerHTML="";
+let today=new Date().toISOString().split("T")[0];
+
+for(let i in savedSeats){
+let d=savedSeats[i];
+if((d.to && d.to<today)||d.due>0){
+let div=document.createElement("div");
+div.innerText="Seat "+i+" | "+d.name+" | ₹"+d.due;
+dueList.appendChild(div);
+}
+}
+}
+
+loadData();
 </script>
 
 </body>
